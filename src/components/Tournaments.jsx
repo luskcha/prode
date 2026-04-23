@@ -68,8 +68,9 @@ export default function Tournaments() {
 
   const handleResultChange = async (matchId, result) => {
     try {
+      const finalResult = result === "" ? null : result;
       await updateDoc(doc(db, "partidos", matchId), {
-        resultado_real: result
+        resultado_real: finalResult
       });
       await fetchMatches(selectedTournament.id);
       recalculateRanking(); // Automatically update users' points
@@ -96,7 +97,7 @@ export default function Tournaments() {
       // 2. Count points
       predictions.forEach(p => {
         const match = allMatches.find(m => m.id === p.partido_id);
-        if (match && match.resultado_real === p.prediccion) {
+        if (match && match.resultado_real && match.resultado_real === p.prediccion) {
           if (userPoints[p.usuario_id] !== undefined) {
              userPoints[p.usuario_id] += 1;
           }
@@ -186,7 +187,7 @@ export default function Tournaments() {
                       onChange={(e) => handleResultChange(m.id, e.target.value)}
                       style={{width: 'auto'}}
                     >
-                      <option value="" disabled>Pendiente</option>
+                      <option value="">Pendiente</option>
                       <option value="L">Local ({m.local})</option>
                       <option value="E">Empate</option>
                       <option value="V">Visitante ({m.visitante})</option>
