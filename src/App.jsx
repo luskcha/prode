@@ -3,16 +3,21 @@ import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-do
 import Dashboard from './components/Dashboard';
 import Users from './components/Users';
 import Tournaments from './components/Tournaments';
+import Rules from './components/Rules';
 
 function Sidebar() {
   const location = useLocation();
   return (
     <div className="sidebar">
+      <div style={{ textAlign: 'center', margin: '1rem 0' }}>
+        <img src="/logo.jpg" alt="Logo PRODEROSO" style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }} />
+      </div>
       <h2 className="sidebar-title">PRODEROSO Admin</h2>
       <div className="nav-links">
         <Link to="/" className={location.pathname === '/' ? 'active' : ''}>Dashboard</Link>
         <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>Gestión de Usuarios</Link>
         <Link to="/tournaments" className={location.pathname === '/tournaments' ? 'active' : ''}>Torneos & Resultados</Link>
+        <Link to="/rules" className={location.pathname === '/rules' ? 'active' : ''}>Reglamento</Link>
       </div>
     </div>
   );
@@ -38,6 +43,9 @@ function App() {
     return (
       <div className="login-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f4f6f8', width: '100vw' }}>
         <div className="login-box" style={{ background: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+            <img src="/logo.jpg" alt="Logo PRODEROSO" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }} />
+          </div>
           <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#333' }}>PRODEROSO Admin</h2>
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
@@ -78,6 +86,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
           <Route path="/tournaments" element={<Tournaments />} />
+          <Route path="/rules" element={<Rules />} />
         </Routes>
       </div>
     </BrowserRouter>
