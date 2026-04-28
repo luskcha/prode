@@ -28,7 +28,7 @@ function Layout() {
     <>
       <header>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img src="/logo.jpg" alt="Logo PRODEROSO" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+          <img src="/oso.png" alt="Logo PRODEROSO" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
           <h1 style={{ margin: 0 }}>🏆 PRODEROSO</h1>
         </div>
         {user && (

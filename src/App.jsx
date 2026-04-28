@@ -10,7 +10,7 @@ function Sidebar() {
   return (
     <div className="sidebar">
       <div style={{ textAlign: 'center', margin: '1rem 0' }}>
-        <img src="/logo.jpg" alt="Logo PRODEROSO" style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }} />
+        <img src="/oso.png" alt="Logo PRODEROSO" style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }} />
       </div>
       <h2 className="sidebar-title">PRODEROSO Admin</h2>
       <div className="nav-links">
@@ -44,7 +44,7 @@ function App() {
       <div className="login-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f4f6f8', width: '100vw' }}>
         <div className="login-box" style={{ background: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' }}>
           <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-            <img src="/logo.jpg" alt="Logo PRODEROSO" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }} />
+            <img src="/oso.png" alt="Logo PRODEROSO" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }} />
           </div>
           <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#333' }}>PRODEROSO Admin</h2>
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
