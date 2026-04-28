@@ -6,6 +6,7 @@ export default function Tournaments() {
   const [tournaments, setTournaments] = useState([]);
   const [matches, setMatches] = useState([]);
   const [selectedTournament, setSelectedTournament] = useState(null);
+  const [winnersModal, setWinnersModal] = useState(null);
   
   // Create New
   const [showCreate, setShowCreate] = useState(false);
@@ -116,6 +117,68 @@ export default function Tournaments() {
     }
   };
 
+  const calculateWinners = async (tId) => {
+    try {
+      const [matchSnap, predSnap, usersSnap] = await Promise.all([
+        getDocs(query(collection(db, "partidos"), where("torneo_id", "==", tId))),
+        getDocs(collection(db, "pronosticos")),
+        getDocs(collection(db, "usuarios"))
+      ]);
+
+      const tMatches = matchSnap.docs.map(d => ({id: d.id, ...d.data()}));
+      const allPreds = predSnap.docs.map(d => d.data());
+      const usersList = usersSnap.docs.map(d => ({id: d.id, ...d.data()}));
+
+      const matchIds = tMatches.map(m => m.id);
+      const tPreds = allPreds.filter(p => matchIds.includes(p.partido_id));
+
+      const pointsPerUser = {};
+      tPreds.forEach(p => {
+        const match = tMatches.find(m => m.id === p.partido_id);
+        if (match && match.resultado_real && match.resultado_real === p.prediccion) {
+           pointsPerUser[p.usuario_id] = (pointsPerUser[p.usuario_id] || 0) + 1;
+        }
+      });
+
+      const winners13 = [];
+      const winners8 = [];
+      
+      for (const [uid, pts] of Object.entries(pointsPerUser)) {
+        const u = usersList.find(x => x.id === uid);
+        if (u) {
+          if (pts >= 13) winners13.push({ ...u, pts });
+          else if (pts >= 8 && pts <= 12) winners8.push({ ...u, pts });
+        }
+      }
+
+      setWinnersModal({ winners13: winners13.sort((a,b) => b.pts - a.pts), winners8: winners8.sort((a,b) => b.pts - a.pts), tId });
+    } catch(e) {
+      console.error("Error calculando ganadores", e);
+    }
+  };
+
+  const applyPrizes = async () => {
+    if(!winnersModal) return;
+    try {
+      const batch = writeBatch(db);
+      winnersModal.winners8.forEach(w => {
+        batch.update(doc(db, "usuarios", w.id), {
+           creditos: (w.creditos || 0) + 1
+        });
+      });
+      batch.update(doc(db, "torneos", winnersModal.tId), { activo: false, finalizado: true });
+      
+      await batch.commit();
+      setWinnersModal(null);
+      setSelectedTournament(null);
+      fetchTournaments();
+      alert("Torneo finalizado. Se han devuelto los créditos a los ganadores de reintegro.");
+    } catch(e) {
+      console.error(e);
+      alert("Error al repartir premios.");
+    }
+  };
+
   return (
     <div>
       <div className="flex-between mb-4">
@@ -165,6 +228,7 @@ export default function Tournaments() {
                     <td>
                       <button onClick={() => {
                         setSelectedTournament(t);
+                        setWinnersModal(null);
                         fetchMatches(t.id);
                       }}>Ver Partidos</button>
                     </td>
@@ -195,6 +259,41 @@ export default function Tournaments() {
                   </div>
                 </div>
               ))}
+              
+              <div className="mt-4" style={{borderTop: '1px solid #ddd', paddingTop: '1rem'}}>
+                <button onClick={() => calculateWinners(selectedTournament.id)}>Calcular Ganadores / Finalizar</button>
+              </div>
+
+              {winnersModal && (
+                <div className="card mt-4" style={{background: 'var(--bg-secondary, #2a2a35)', border: '1px solid var(--primary)'}}>
+                  <h3>Resultados del Torneo</h3>
+                  
+                  <div className="mt-4">
+                    <h4 style={{color: '#ffc107', marginBottom: '0.5rem'}}>🏆 Ganadores del Pozo (13 a 15 aciertos):</h4>
+                    {winnersModal.winners13.length === 0 ? <p style={{color: '#aaa'}}>Nadie alcanzó 13 aciertos.</p> : (
+                      <ul style={{listStyle: 'none', padding: 0}}>
+                        {winnersModal.winners13.map(w => <li key={w.id} style={{padding: '0.5rem', background: 'rgba(255,255,255,0.05)', marginBottom: '0.5rem', borderRadius: '4px'}}>{w.alias || w.nombre} - <strong>{w.pts} aciertos</strong></li>)}
+                      </ul>
+                    )}
+                  </div>
+
+                  <div className="mt-4">
+                    <h4 style={{color: '#0dcaf0', marginBottom: '0.5rem'}}>🔁 Reintegros (8 a 12 aciertos - Recuperan 1 crédito):</h4>
+                    {winnersModal.winners8.length === 0 ? <p style={{color: '#aaa'}}>Ningún reintegro.</p> : (
+                      <ul style={{listStyle: 'none', padding: 0}}>
+                        {winnersModal.winners8.map(w => <li key={w.id} style={{padding: '0.5rem', background: 'rgba(255,255,255,0.05)', marginBottom: '0.5rem', borderRadius: '4px'}}>{w.alias || w.nombre} - <strong>{w.pts} aciertos</strong></li>)}
+                      </ul>
+                    )}
+                  </div>
+                  
+                  {selectedTournament.activo && (
+                    <div className="mt-4" style={{padding: '1rem', background: 'rgba(220,53,69,0.1)', borderRadius: '4px', border: '1px solid rgba(220,53,69,0.5)'}}>
+                      <p style={{marginBottom: '1rem'}}><strong>Atención:</strong> Al finalizar, el torneo se cerrará y se asignarán los créditos de reintegro automáticamente a los usuarios correspondientes.</p>
+                      <button onClick={applyPrizes} style={{background: '#dc3545', color: 'white'}}>Cerrar Torneo y Repartir Reintegros</button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

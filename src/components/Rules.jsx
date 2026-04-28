@@ -26,19 +26,6 @@ const Rules = () => {
       </section>
 
       <section style={{ marginBottom: '20px' }}>
-        <h3 style={{ color: '#007bff' }}>📊 3. FORMACIÓN DEL POZO</h3>
-        <p>A medida que los jugadores participan, se forma un pozo total.</p>
-        <ul>
-          <li>Del total recaudado:
-            <ul>
-              <li>25% corresponde al organizador (comisión).</li>
-              <li>75% se destina a premios.</li>
-            </ul>
-          </li>
-        </ul>
-      </section>
-
-      <section style={{ marginBottom: '20px' }}>
         <h3 style={{ color: '#007bff' }}>🏆 4. DISTRIBUCIÓN DE PREMIOS</h3>
         <p>Del 75% destinado a premios:</p>
         <div style={{ marginLeft: '20px' }}>
