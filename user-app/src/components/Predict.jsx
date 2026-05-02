@@ -46,11 +46,14 @@ export default function Predict() {
     const existing = {};
     pSnap.docs.forEach(d => {
       const data = d.data();
-      existing[data.partido_id] = data.prediccion;
+      // Solo cargar los pronósticos que corresponden a los partidos del torneo actual
+      if (allMatches.some(m => m.id === data.partido_id)) {
+        existing[data.partido_id] = data.prediccion;
+      }
     });
     setPredictions(existing);
     
-    // Si ya tiene pronósticos, bloquear edición
+    // Si ya tiene pronósticos para ESTE torneo, bloquear edición
     const hasExistingPredictions = Object.keys(existing).length > 0;
     setHasPredicted(hasExistingPredictions);
   };
